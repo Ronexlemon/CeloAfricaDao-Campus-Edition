@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useAccount,useReadContract } from "wagmi";
+import { useAccount,useReadContract,useWriteContract } from "wagmi";
 import { useForm } from "react-hook-form";
 import { data } from "@/constant/data";
-import MarketCard from "@/components/Card";
+import MarketCard, { CardData, CardProps } from "@/components/Card";
 import auctionAbi from "../constant/abi/auction.json"
 import { AuctionContractAddress } from "@/constant/address";
 import { uploadImage, uploadImageAndGetUrl } from "@/upload/uploadImage";
@@ -15,14 +15,18 @@ const Home = () => {
   const [isOpen, setOpen] = useState(false);
 
   const { register, handleSubmit } = useForm();
+  const { data: hash, writeContract } = useWriteContract() 
 
-  const {data:itemdata} = useReadContract({
+  const itemdata = useReadContract({
     abi:auctionAbi,
     address: AuctionContractAddress,
     functionName: 'getAllItems',
   })
   
-  console.log("the data is data contract",itemdata)
+  
+
+  const dataArray = Array.isArray(itemdata.data) ? itemdata.data : [];
+  console.log("the data is data data array contract",dataArray)
 
   
 
@@ -31,6 +35,18 @@ const Home = () => {
   try {
     const base64Image:any =  await convertBase64(formData.image[0]);
     const imageUrl =   await cloudinary.v2.uploader.upload(base64Image )
+    if(!imageUrl || imageUrl == undefined){
+      console.log("please upload image")
+      return;
+    }
+
+    writeContract({
+      address: AuctionContractAddress,
+      abi:auctionAbi,
+      functionName: 'addItem',
+      args: [imageUrl.url, formData.year, formData.model, formData.price],
+    });
+
     console.log("Image uploaded successfully. Image URL:", imageUrl.url);
     console.log(formData);
   } catch (error) {
@@ -90,7 +106,7 @@ const Home = () => {
         </div>
       )}
       <div className="w-full">
-            <MarketCard data={data} />
+            <MarketCard data={dataArray} />
           </div>
     </div>
   );
