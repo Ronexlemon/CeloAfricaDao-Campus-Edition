@@ -5,6 +5,9 @@ import { data } from "@/constant/data";
 import MarketCard from "@/components/Card";
 import auctionAbi from "../constant/abi/auction.json"
 import { AuctionContractAddress } from "@/constant/address";
+import { uploadImage, uploadImageAndGetUrl } from "@/upload/uploadImage";
+import cloudinary from "@/utils/cloudinary";
+import { convertBase64 } from "@/utils/converttobase64";
 
 const Home = () => {
   const { address, isConnected } = useAccount();
@@ -21,8 +24,20 @@ const Home = () => {
   
   console.log("the data is data contract",itemdata)
 
-  const onSubmit = async (formData: any) => {
+  
+
+  const onSubmit = async (formData:any) => {
+   
+  try {
+    const base64Image:any =  await convertBase64(formData.image[0]);
+    const imageUrl =   await cloudinary.v2.uploader.upload(base64Image )
+    console.log("Image uploaded successfully. Image URL:", imageUrl.url);
     console.log(formData);
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    // Handle any error scenarios during image conversion or upload
+  }
+
   };
 
   useEffect(() => {
