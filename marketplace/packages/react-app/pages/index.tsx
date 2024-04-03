@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount,useReadContract } from "wagmi";
 import { useForm } from "react-hook-form";
 import { data } from "@/constant/data";
 import MarketCard from "@/components/Card";
+import auctionAbi from "../constant/abi/auction.json"
+import { AuctionContractAddress } from "@/constant/address";
 
 const Home = () => {
   const { address, isConnected } = useAccount();
@@ -11,11 +13,20 @@ const Home = () => {
 
   const { register, handleSubmit } = useForm();
 
+  const {data:itemdata} = useReadContract({
+    abi:auctionAbi,
+    address: AuctionContractAddress,
+    functionName: 'getAllItems',
+  })
+  
+  console.log("the data is data contract",itemdata)
+
   const onSubmit = async (formData: any) => {
     console.log(formData);
   };
 
   useEffect(() => {
+    console.log("the data is data contract",itemdata)
     if (isConnected && address) {
       setUserAddress(address);
     }
