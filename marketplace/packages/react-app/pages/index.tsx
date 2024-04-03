@@ -9,10 +9,13 @@ import { uploadImage, uploadImageAndGetUrl } from "@/upload/uploadImage";
 import cloudinary from "@/utils/cloudinary";
 import { convertBase64 } from "@/utils/converttobase64";
 
+
 const Home = () => {
   const { address, isConnected } = useAccount();
   const [userAddress, setUserAddress] = useState("");
   const [isOpen, setOpen] = useState(false);
+  const [isSubmit, setSubmit] = useState(true);
+
 
   const { register, handleSubmit } = useForm();
   const { data: hash, writeContract } = useWriteContract() 
@@ -70,6 +73,9 @@ const Home = () => {
           <button onClick={() => setOpen(true)} className="text-center">Add</button>
         </div>
       </div>
+      
+        
+      
 
       {isOpen && (
         <div className="h-1/2 w-full static">
@@ -105,6 +111,7 @@ const Home = () => {
           
         </div>
       )}
+      
       <div className="w-full">
             <MarketCard data={dataArray} />
           </div>
