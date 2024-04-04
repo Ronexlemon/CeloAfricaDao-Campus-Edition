@@ -31,7 +31,9 @@ const Home = () => {
   const dataArray = Array.isArray(itemdata.data) ? itemdata.data : [];
   console.log("the data is data data array contract",dataArray)
 
-  
+  const testIt =()=>{
+    console.log("yes")
+  }
 
   const onSubmit = async (formData:any) => {
    
