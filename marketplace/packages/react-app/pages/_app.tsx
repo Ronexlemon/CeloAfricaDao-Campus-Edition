@@ -12,7 +12,7 @@ import type { AppProps } from "next/app";
 // import { publicProvider } from "wagmi/providers/public";
 import Layout from "../components/Layout";
 import "../styles/globals.css";
-import { celo, celoAlfajores } from "viem/chains";
+import { celo, celoAlfajores,sepolia } from "viem/chains";
 
 const projectIdd = "48c5bba351a2f48fad4dac021d3c733b" //process.env.NEXT_PUBLIC_WC_PROJECT_ID as string; // get one at https://cloud.walletconnect.com/app
 

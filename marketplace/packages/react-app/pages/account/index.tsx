@@ -3,15 +3,16 @@ import { useAccount,useReadContract,useWriteContract } from "wagmi";
 import { useForm } from "react-hook-form";
 import { data } from "@/constant/data";
 import MarketCard, { CardData, CardProps } from "@/components/Card";
-import auctionAbi from "../constant/abi/auction.json"
+import auctionAbi from "../../constant/abi/auction.json"
 import { AuctionContractAddress } from "@/constant/address";
 import { uploadImage, uploadImageAndGetUrl } from "@/upload/uploadImage";
 import cloudinary from "@/utils/cloudinary";
 import { convertBase64 } from "@/utils/converttobase64";
+import AccountCard from "@/components/AccountCard";
 import { ethers } from "ethers";
 
 
-const Home = () => {
+const MyAccount = () => {
   const { address, isConnected } = useAccount();
   const [userAddress, setUserAddress] = useState("");
   const [isOpen, setOpen] = useState(false);
@@ -20,12 +21,14 @@ const Home = () => {
 
   const { register, handleSubmit } = useForm();
   const { data: hash, writeContract } = useWriteContract() 
-  const { data: hash2, writeContract:writebuycontract } = useWriteContract() 
+  const { data: hash2, writeContract: writeremoveContract } = useWriteContract() 
 
   const itemdata = useReadContract({
     abi:auctionAbi,
     address: AuctionContractAddress,
-    functionName: 'getAllItems',
+    functionName: 'myItems',
+    args: [address],
+
   })
   
   
@@ -51,8 +54,7 @@ const Home = () => {
       address: AuctionContractAddress,
       abi:auctionAbi,
       functionName: 'addItem',
-      args: [imageUrl.url, formData.year, formData.model, formData.price],
-      
+      args: [imageUrl.url, formData.year, formData.model, ethers.utils.parseEther(formData.price)],
     });
 
     console.log("Image uploaded successfully. Image URL:", imageUrl.url);
@@ -63,16 +65,14 @@ const Home = () => {
   }
 
   };
-
-  const handleBuy = (itemValue: number,itemId:number) => {
+  const handleRemove = (itemId: number) => {
     // Call your function here
-    console.log("Removing item with ID:", itemValue);
-    writebuycontract({
+    console.log("Removing item with ID:", itemId);
+    writeremoveContract({
       address: AuctionContractAddress,
       abi:auctionAbi,
-      functionName: 'buyItem',
-      args: [itemValue,itemId],
-      value:BigInt(itemValue),
+      functionName: 'removeItem',
+      args: [itemId],
     });
   };
 
@@ -87,8 +87,7 @@ const Home = () => {
     <div className="h-full max-w-full relative">
       <div className="w-full h-32 flex justify-end">
         <div className="bg-green-500 rounded-2xl w-28 h-10 flex justify-center text-center">
-          {/* <button onClick={() => setOpen(true)} className="text-center">Add</button> */}
-          <span className="text-center ">MarketPlace</span>
+          <button onClick={() => setOpen(true)} className="text-center">Add</button>
         </div>
       </div>
       
@@ -104,11 +103,11 @@ const Home = () => {
                 <input type="file" className="w-1/2 h bg-slate-200" {...register("image", { required: true })} />
               </div>
               <div className="flex justify-around items-center mt-2">
-                <label className="text-white">Model</label>
+                <label className="text-white">Name</label>
                 <input type="text" placeholder="Urus" className="w-1/2 bg-slate-200 text-center" {...register("model", { required: true })} />
               </div>
               <div className="flex justify-around items-center mt-2">
-                <label className="text-white">Year</label>
+                <label className="text-white">EOM</label>
                 <input type="text" placeholder="2024" className="w-1/2 bg-slate-200 text-center" {...register("year", { required: true })} />
               </div>
               <div className="flex justify-around items-center mt-2">
@@ -131,10 +130,10 @@ const Home = () => {
       )}
       
       <div className="w-full">
-            <MarketCard data={dataArray} onBuy={handleBuy} />
+            <AccountCard data={dataArray}  onRemove={handleRemove}/>
           </div>
     </div>
   );
 };
 
-export default Home;
+export default MyAccount;
